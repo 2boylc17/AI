@@ -7,10 +7,15 @@ class WaterStation(Agent):
         super().__init__(position)
 
     def decide(self, percept):
-        pass
+        for k, v in percept.items():
+            if utils.is_robot(v):
+                return "refill", k, v
+        return "idle", -1, -1
 
     def act(self, environment):
-        pass
+        cell = self.sense(environment)
+        decision = self.decide(cell)
+        print(decision)
 
     def __str__(self):
         return '💧'
