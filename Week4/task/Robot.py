@@ -39,12 +39,17 @@ class Robot(Agent):
         g_values = {start: 0}
 
         while len(p_queue) != 0:
+            print("p queue print", p_queue)
+            print("g value print", g_values)
             current_cell = heapq.heappop(p_queue)[1]
             if current_cell == goal:
                 return self.get_path(predecessors, start, goal)
             for direction in ["up", "right", "down", "left"]:
                 row_offset, col_offset = directions[direction]
+                print("row_offset, col_offset", row_offset, col_offset)
+                print("Current cells", current_cell[0], current_cell[1])
                 neighbour = (current_cell[0] + row_offset, current_cell[1] + col_offset)
+                print("neighbour print", neighbour)
 
                 if self.viable_move(neighbour[0], neighbour[1], self.sense(environment)) and neighbour not in g_values:
                     cost = g_values[current_cell] + 1
@@ -65,9 +70,9 @@ class Robot(Agent):
 
     def viable_move(self, x, y, adjacent):
         # You will need to do this one
-        #print("ppppp",adjacent[x,y])
-        #print("ooooo",x, y)
-        cell = adjacent[x,y]
+        print("ppppp",adjacent[x,y])
+        print("ooooo",x, y)
+        cell = adjacent[x, y]
         # Do not move in to a cell containing an obstacle (represented by 'x')
         if cell == 'x':
             return False
