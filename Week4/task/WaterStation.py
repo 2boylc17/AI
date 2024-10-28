@@ -9,8 +9,8 @@ class WaterStation(Agent):
     def decide(self, percept):
         for k, v in percept.items():
             if utils.is_robot(v):
-                return "refill", k, v
-        return "idle", -1, -1
+                v.refill()
+        return
 
     def act(self, environment):
         cell = self.sense(environment)

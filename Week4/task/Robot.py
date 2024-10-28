@@ -18,14 +18,14 @@ class Robot(Agent):
         pass
 
     def move(self, environment, to):
-        if environment.move_to(self.position, to):
-            self.position = to
+        #if environment.move_to(self.position, to):
+        self.calc_path(self.position, to, environment)
 
     def __str__(self):
         return '🚒'
 
     # MANHATTAN DISTANCE FUNCTIONS
-    def calc_path(self, start, goal, avoid):
+    def calc_path(self, start, goal, environment):
         p_queue = []
         heapq.heappush(p_queue, (0, start))
 
@@ -46,7 +46,7 @@ class Robot(Agent):
                 row_offset, col_offset = directions[direction]
                 neighbour = (current_cell[0] + row_offset, current_cell[1] + col_offset)
 
-                if self.viable_move(neighbour[0], neighbour[1], avoid) and neighbour not in g_values:
+                if self.viable_move(neighbour[0], neighbour[1], self.sense(environment)) and neighbour not in g_values:
                     cost = g_values[current_cell] + 1
                     g_values[neighbour] = cost
                     f_value = cost + self.calc_distance(goal, neighbour)
@@ -63,15 +63,27 @@ class Robot(Agent):
         path.reverse()
         return path
 
-    def viable_move(self, x, y, types):
+    def viable_move(self, x, y, adjacent):
         # You will need to do this one
+        #print("ppppp",adjacent[x,y])
+        #print("ooooo",x, y)
+        cell = adjacent[x,y]
         # Do not move in to a cell containing an obstacle (represented by 'x')
+        if cell == 'x':
+            return False
         # Do not move in to a cell containing a flame
+        elif utils.is_flame(cell):
+            return False
         # Do not move in to a cell containing a water station
+        elif utils.is_water_station(cell):
+            return False
         # Do not move in to a cell containing a robot.
+        elif utils.is_robot(cell):
+            return False
         # In fact, the only valid cells are blank ones
         # Also, do not go out of bounds.
-        pass
+        else:
+            return True
 
     def calc_distance(self, point1: tuple[int, int], point2: tuple[int, int]):
         x1, y1 = point1
@@ -79,3 +91,6 @@ class Robot(Agent):
         return abs(x1 - x2) + abs(y1 - y2)
 
     # END OF MANHATTAN DISTANCE FUNCTIONS
+
+    def refill(self):
+        self.water_level = 100
