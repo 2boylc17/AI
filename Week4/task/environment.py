@@ -52,6 +52,30 @@ class Environment:
             out += "\n"
         return out
 
+    def move_to(self, start, goal):
+        valid = False
+        if (goal[0], goal[1]) == (start[0] + 1, goal[1]):
+            valid = True
+        elif (goal[0], goal[1]) == (start[0] - 1, goal[1]):
+            valid = True
+        elif (goal[0], goal[1]) == (goal[0], start[1] + 1):
+            valid = True
+        elif (goal[0], goal[1]) == (goal[0], start[1] - 1):
+            valid = True
+        print("goal", goal[0], goal[1])
+        # print("start", start[0], start[1])
+        # print("1",(start[0] + 1, goal[1]))
+        # print("2",(start[0] - 1, goal[1]))
+        # print("3",(goal[0], goal[1] + 1))
+        # print("4",(goal[0], goal[1] - 1))
+        # print("Valid", valid)
+        if valid is True:
+            print("success")
+            return True
+        else:
+            return False
+
+
 
 if __name__ == "__main__":
     e = Environment("map.txt")
@@ -59,10 +83,12 @@ if __name__ == "__main__":
     water = e.world[1][5]
     robot1 = e.world[2][5]
 
-    for i in range(1):  # Change 1 simulate more moves. I.e. 100 would simulate 100 moves
+    for i in range(50):  # Change 1 simulate more moves. I.e. 100 would simulate 100 moves
         # Call the act method for each agent operating in the environment
         water.act(e)
         print(e)
-        robot1.move(e, [5, 3])
-        print(e)
-
+        robot1.decide(e)
+        #robot1.flame(e)
+        # print("before", robot1.position)
+        robot1.random(e)
+        # print("after", robot1.position)

@@ -12,14 +12,53 @@ class Robot(Agent):
         self.water_station_location = None
 
     def decide(self, percept: dict[tuple[int, int], ...]):
-        pass
+        adjacent = self.sense(percept)
+        print("d", adjacent)
+        for cell in adjacent:
+            print("cell value decide", cell, adjacent[cell], utils.is_flame(adjacent[cell]))
+            if utils.is_flame(adjacent[cell]):
+                print("checking", percept[cell])
 
     def act(self, environment):
         pass
 
+    def flame(self, environment):
+        adjacent = self.sense(environment)
+        for cell in adjacent:
+            print("cell value", cell, environment.world[cell[1]][cell[0]])
+            if environment.world[cell[1]][cell[0]] == '🔥':
+                print("Flame sensed")
+                environment.world[cell[1]][cell[0]] = ''
+
+    def random(self, environment):
+        directions = {
+            "right": (0, 1),
+            "left": (0, -1),
+            "up": (-1, 0),
+            "down": (1, 0)
+        }
+        names = ["up", "right", "down", "left"]
+        num = random.randint(1, 4)
+        way = names[num - 1]
+        for direction in names:
+            #print("check", directions[way], directions[direction])
+            if directions[way] == directions[direction]:
+                #print("happening", self.position, directions[way])
+                to = (self.position[0] + directions[way][0], self.position[1] + directions[way][1])
+                #print("happen", to)
+                self.move(environment, to)
+                break
+
     def move(self, environment, to):
-        #if environment.move_to(self.position, to):
-        self.calc_path(self.position, to, environment)
+        if environment.move_to(self.position, to) and self.viable_move(to[0], to[1], self.sense(environment)):
+            print(self.position, to)
+            old = self.position
+            self.position = (to[0], to[1])
+            print(self.position)
+            environment.world[old[1]][old[0]] = ''
+            environment.world[self.position[1]][self.position[0]] = self.__str__()
+        elif self.viable_move(to[0], to[1], self.sense(environment)) is not True:
+            print("blocked")
 
     def __str__(self):
         return '🚒'
@@ -70,8 +109,8 @@ class Robot(Agent):
 
     def viable_move(self, x, y, adjacent):
         # You will need to do this one
-        print("ppppp",adjacent[x,y])
-        print("ooooo",x, y)
+        # print("p", adjacent[x, y])
+        # print("o", x, y)
         cell = adjacent[x, y]
         # Do not move in to a cell containing an obstacle (represented by 'x')
         if cell == 'x':
