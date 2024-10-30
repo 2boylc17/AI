@@ -10,25 +10,38 @@ class Robot(Agent):
         super().__init__(position)
         self.water_level = 100
         self.water_station_location = None
+        self.action = ''
 
     def decide(self, percept: dict[tuple[int, int], ...]):
-        adjacent = self.sense(percept)
-        print("d", adjacent)
-        for cell in adjacent:
-            print("cell value decide", cell, adjacent[cell], utils.is_flame(adjacent[cell]))
-            if utils.is_flame(adjacent[cell]):
+        print("d", percept)
+        for cell, data in percept.items():
+            print("cell value decide", cell, data, utils.is_flame(data))
+            if utils.is_water_station(percept[cell]) and self.water_station_location is None:
+                self.water_station_location = cell
+            if utils.is_flame(percept[cell]) and self.water_level > 0:
                 print("checking", percept[cell])
+                self.action = 'Flame'
+                return cell
+            elif self.water_level <= 0 and self.water_station_location is not None:
+                self.action = 'Refill Journey'
+                return
+
 
     def act(self, environment):
-        pass
+        self.action = ''
+        cells = self.sense(environment)
+        decision = self.decide(cells)
+        print("q", decision)
+        if self.action == 'Flame':
+            print("here", environment.world[decision[1]][decision[0]])
+            environment.world[decision[1]][decision[0]] = ''
+            self.water_level = self.water_level - 5
+        if self.action == 'Refill Journey':
+            print("Returning")
+            self.calc_path(self.position, self.water_station_location, environment)
+        else:
+            self.random(environment)
 
-    def flame(self, environment):
-        adjacent = self.sense(environment)
-        for cell in adjacent:
-            print("cell value", cell, environment.world[cell[1]][cell[0]])
-            if environment.world[cell[1]][cell[0]] == '🔥':
-                print("Flame sensed")
-                environment.world[cell[1]][cell[0]] = ''
 
     def random(self, environment):
         directions = {
@@ -78,17 +91,17 @@ class Robot(Agent):
         g_values = {start: 0}
 
         while len(p_queue) != 0:
-            print("p queue print", p_queue)
-            print("g value print", g_values)
+            #print("p queue print", p_queue)
+            #print("g value print", g_values)
             current_cell = heapq.heappop(p_queue)[1]
             if current_cell == goal:
                 return self.get_path(predecessors, start, goal)
             for direction in ["up", "right", "down", "left"]:
                 row_offset, col_offset = directions[direction]
-                print("row_offset, col_offset", row_offset, col_offset)
-                print("Current cells", current_cell[0], current_cell[1])
+                #print("row_offset, col_offset", row_offset, col_offset)
+                #print("Current cells", current_cell[0], current_cell[1])
                 neighbour = (current_cell[0] + row_offset, current_cell[1] + col_offset)
-                print("neighbour print", neighbour)
+                #print("neighbour print", neighbour)
 
                 if self.viable_move(neighbour[0], neighbour[1], self.sense(environment)) and neighbour not in g_values:
                     cost = g_values[current_cell] + 1
@@ -109,9 +122,11 @@ class Robot(Agent):
 
     def viable_move(self, x, y, adjacent):
         # You will need to do this one
-        # print("p", adjacent[x, y])
-        # print("o", x, y)
-        cell = adjacent[x, y]
+        print("a", adjacent)
+        tu = (x, y)
+        print("p", adjacent[(x, y)])
+        print("o", x, y)
+        cell = adjacent[(x, y)]
         # Do not move in to a cell containing an obstacle (represented by 'x')
         if cell == 'x':
             return False

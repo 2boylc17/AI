@@ -83,12 +83,10 @@ if __name__ == "__main__":
     water = e.world[1][5]
     robot1 = e.world[2][5]
 
-    for i in range(50):  # Change 1 simulate more moves. I.e. 100 would simulate 100 moves
+    for i in range(500):  # Change 1 simulate more moves. I.e. 100 would simulate 100 moves
         # Call the act method for each agent operating in the environment
         water.act(e)
         print(e)
-        robot1.decide(e)
-        #robot1.flame(e)
         # print("before", robot1.position)
-        robot1.random(e)
+        robot1.act(e)
         # print("after", robot1.position)

@@ -15,7 +15,6 @@ class WaterStation(Agent):
     def act(self, environment):
         cell = self.sense(environment)
         decision = self.decide(cell)
-        print(decision)
 
     def __str__(self):
         return '💧'
